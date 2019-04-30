@@ -29,3 +29,5 @@ bool FolderModifyRights(const CString useraccountname, const DWORD useraccount_t
 					   CString* servername, const DWORD uses, DWORD Access);
 
 BOOL GetUserDomainName(CString *Name);
+
+bool ShareNameDir(const CString& Name, const CString& SharePathName, const CString& ShareComment);

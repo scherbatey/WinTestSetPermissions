@@ -3,6 +3,8 @@
 #include "stdafx.h"
 #include "permissions.h"
 
+#include <Lm.h>
+#include <iostream>
 #include <LMShare.h>
 #include <aclapi.h>
 
@@ -239,4 +241,39 @@ BOOL GetUserDomainName(CString *Name)
 	}
 
 	return b_ret;
+}
+
+#pragma comment(lib, "Netapi32.lib")
+bool ShareNameDir(const CString& Name, const CString& SharePathName, const CString& ShareComment)
+{
+	// pour passage des chaines en unicode
+	CStringW wShareName = Name;
+	CStringW wSharePathName = SharePathName;
+	CStringW wShareComment = ShareComment;
+
+	SHARE_INFO_2 Buf;
+	::ZeroMemory(&Buf, sizeof(SHARE_INFO_2));
+
+	Buf.shi2_netname = (LPWSTR)wShareName.GetBuffer();
+	Buf.shi2_type = STYPE_DISKTREE;
+	Buf.shi2_remark = (LPWSTR)wShareComment.GetBuffer();
+	Buf.shi2_permissions = ACCESS_ALL;
+	Buf.shi2_max_uses = SHI_USES_UNLIMITED;
+	Buf.shi2_current_uses = 1;
+	Buf.shi2_path = (LPWSTR)wSharePathName.GetBuffer();
+	Buf.shi2_passwd = NULL; // No password
+
+	DWORD dwerr = 9999;
+	NET_API_STATUS res=NetShareAdd (NULL, 2, (LPBYTE)&Buf, &dwerr);
+
+	if (res!=NERR_Success)
+	{
+		CString osMsg;
+		osMsg.Format(_T("ShareNameDir failed - Error %d (%x).\r\n\tName: %s\r\n\tSharePath: %s"), res, dwerr, (LPCTSTR)Name, (LPCTSTR)SharePathName);
+		std::cout << osMsg << std::endl;
+
+		return false;
+	}
+
+	return true;
 }

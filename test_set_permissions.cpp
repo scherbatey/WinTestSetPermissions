@@ -33,8 +33,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		//if (ERROR_SUCCESS != dwRes)
 		//	std::cout << "ERROR: (" << dwRes << ") " << GetWidowsErrorMessageByCode(dwRes);
 	}
+	else if (argc == 4)
+	{
+		ShareNameDir(argv[1], argv[2], argv[3]);
+	}
 	else
-		dwRes = ~0UL;
+		dwRes = -1;
 	return dwRes;
 }
-
